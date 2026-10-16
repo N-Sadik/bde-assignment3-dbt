@@ -1,0 +1,36 @@
+# Assignment 3 - Airbnb Sydney ELT warehouse (medallion: bronze -> silver -> gold -> datamart)
+name: 'bde_assignment3'
+version: '1.0.0'
+config-version: 2
+
+profile: 'default'
+
+model-paths: ["models"]
+analysis-paths: ["analyses"]
+test-paths: ["tests"]
+seed-paths: ["seeds"]
+macro-paths: ["macros"]
+snapshot-paths: ["snapshots"]
+
+clean-targets:
+  - "target"
+  - "dbt_packages"
+
+models:
+  bde_assignment3:
+    # Silver: cleaned, typed, consistently named copies of the bronze tables
+    silver:
+      +schema: silver
+      +materialized: table
+    # Gold: star schema (dimensions from snapshots + fact table + census reference)
+    gold:
+      +schema: gold
+      +materialized: table
+    # Datamart: business-question views on top of the star schema (SCD2 joins)
+    datamart:
+      +schema: datamart
+      +materialized: view
+
+snapshots:
+  bde_assignment3:
+    +target_schema: silver
